@@ -161,6 +161,7 @@ public class GridSizeDialog extends javax.swing.JDialog {
         Settings.MaxRowSquares = Integer.parseInt(maxRowsSpinner.getValue().toString());
         
         UI.Settings = Settings;
+        
         UI.reset();
         this.setVisible(false);
     }//GEN-LAST:event_okButtonActionPerformed

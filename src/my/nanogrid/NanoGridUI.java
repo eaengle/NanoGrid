@@ -151,6 +151,11 @@ public class NanoGridUI extends javax.swing.JFrame {
         menuSettings.add(menuOptions);
 
         menuRefresh.setText("Refresh Puzzle");
+        menuRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuRefreshActionPerformed(evt);
+            }
+        });
         menuSettings.add(menuRefresh);
 
         menuBarMain.add(menuSettings);
@@ -187,7 +192,11 @@ public class NanoGridUI extends javax.swing.JFrame {
 
     private void menuLoadPuzzleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadPuzzleActionPerformed
        File loadFile = getBoardFile();
+       Game.loadBoard(loadFile);
        Game.resetBoard(loadFile);
+       Settings = Game.getSettings();
+       redraw();
+       
     }//GEN-LAST:event_menuLoadPuzzleActionPerformed
 
     private void menuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExitActionPerformed
@@ -205,12 +214,19 @@ public class NanoGridUI extends javax.swing.JFrame {
 
     private void menuLoadGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadGameActionPerformed
        File loadFile = getBoardFile();
-       Game.setBoard(loadFile);
+       Game.loadBoard(loadFile);
+       Settings = Game.getSettings();
+       redraw();
+       placeMarks();
     }//GEN-LAST:event_menuLoadGameActionPerformed
 
     private void menuSavePuzzleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSavePuzzleActionPerformed
         saveGame();
     }//GEN-LAST:event_menuSavePuzzleActionPerformed
+
+    private void menuRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRefreshActionPerformed
+        reset();
+    }//GEN-LAST:event_menuRefreshActionPerformed
 
     /**
      * @param args the command line arguments
@@ -293,6 +309,11 @@ public class NanoGridUI extends javax.swing.JFrame {
         displayGame(false);
     }
 
+    void redraw(){
+        setPanes();
+        redrawGrid();
+        displayGame(false);
+    }
     public void setup() {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         createGame();
@@ -626,5 +647,25 @@ public class NanoGridUI extends javax.swing.JFrame {
             return chooser.getSelectedFile();
      }
         return null;
+    }
+
+    private void placeMarks() {
+        char[][]board = Game.getPlayColumns();
+        for(int c=0;c<board.length;c++){
+            for(int r=0;r<board.length;r++){
+                JTextPane pane = Panes[c][r];
+                if (board[c][r] == NanoGridBoard.FillChar){
+                    setCell(pane);
+                }
+                else if (board[c][r] == NanoGridBoard.MarkChar){
+                    setMark(pane);
+                }
+                else{
+                    setClear(pane);
+                }
+                    
+            }
+        }
+        
     }
 }
