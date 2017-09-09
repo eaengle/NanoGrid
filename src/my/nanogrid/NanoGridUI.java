@@ -7,11 +7,15 @@ package my.nanogrid;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.TextArea;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowListener;
+import java.awt.font.LineMetrics;
 import java.io.File;
 import java.lang.reflect.Array;
 import static javafx.application.Platform.exit;
@@ -75,6 +79,8 @@ public class NanoGridUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nano Grid");
+        setResizable(false);
+        setSize(new java.awt.Dimension(100, 100));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -191,12 +197,12 @@ public class NanoGridUI extends javax.swing.JFrame {
     }//GEN-LAST:event_menuOptionsActionPerformed
 
     private void menuLoadPuzzleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadPuzzleActionPerformed
-       File loadFile = getBoardFile();
-       Game.loadBoard(loadFile);
-       Game.resetBoard(loadFile);
-       Settings = Game.getSettings();
-       redraw();
-       
+        File loadFile = getBoardFile();
+        Game.loadBoard(loadFile);
+        Game.resetBoard(loadFile);
+        Settings = Game.getSettings();
+        redraw();
+
     }//GEN-LAST:event_menuLoadPuzzleActionPerformed
 
     private void menuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExitActionPerformed
@@ -213,11 +219,11 @@ public class NanoGridUI extends javax.swing.JFrame {
     }//GEN-LAST:event_menuSaveGameActionPerformed
 
     private void menuLoadGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadGameActionPerformed
-       File loadFile = getBoardFile();
-       Game.loadBoard(loadFile);
-       Settings = Game.getSettings();
-       redraw();
-       placeMarks();
+        File loadFile = getBoardFile();
+        Game.loadBoard(loadFile);
+        Settings = Game.getSettings();
+        redraw();
+        placeMarks();
     }//GEN-LAST:event_menuLoadGameActionPerformed
 
     private void menuSavePuzzleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSavePuzzleActionPerformed
@@ -293,6 +299,7 @@ public class NanoGridUI extends javax.swing.JFrame {
     }
 
     private void initCustom() {
+        
         Settings = new NanoGridParameters();
         Settings.Columns = 5;
         Settings.Rows = 5;
@@ -309,67 +316,82 @@ public class NanoGridUI extends javax.swing.JFrame {
         displayGame(false);
     }
 
-    void redraw(){
+    void redraw() {
+         
         setPanes();
         redrawGrid();
+        
         displayGame(false);
+        
     }
+
     public void setup() {
+        
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         createGame();
         setPanes();
+        
         displayGame(false);
+       
     }
     JTextPane[][] Panes;
     JTextPane[] RowPanes;
     JTextPane[] ColPanes;
 
+    
     private void setPanes() {
+        
         Panes = new JTextPane[Settings.Columns][Settings.Rows];
         ColPanes = new JTextPane[Settings.Columns];
         RowPanes = new JTextPane[Settings.Rows];
+        
         GroupLayout layout = (GroupLayout) mainPanel.getLayout();
         layout.setAutoCreateGaps(true);
 
         GroupLayout.ParallelGroup hGroup = layout.createParallelGroup();
+        layout.setHorizontalGroup(hGroup);
+        
         GroupLayout.SequentialGroup vGroup = layout.createSequentialGroup();
         vGroup.addPreferredGap(ComponentPlacement.RELATED, 1, 1);
-        layout.setHorizontalGroup(hGroup);
         layout.setVerticalGroup(vGroup);
+        int rowWidth = getRowWidth();
+        int colHeight = getColHeight();
+        int cellSize = getCellSize();
         for (int row = 0; row < Settings.Rows + 1; row++) {
             GroupLayout.SequentialGroup h1Group = layout.createSequentialGroup();
             h1Group.addPreferredGap(ComponentPlacement.RELATED, 1, 1);
+            hGroup.addGroup(h1Group);
+            
             GroupLayout.ParallelGroup v1Group = layout.createParallelGroup();
             vGroup.addGroup(v1Group);
-            hGroup.addGroup(h1Group);
+            
             for (int col = 0; col < Settings.Columns + 1; col++) {
                 JTextPane pane = createPane();
                 if (col > 0 && row > 0) {
                     Panes[col - 1][row - 1] = pane;
-                    h1Group.addComponent(pane, 25, 25, 25);
-                    v1Group.addComponent(pane, 25, 25, 25);
+                    h1Group.addComponent(pane, cellSize, cellSize, cellSize);
+                    v1Group.addComponent(pane, cellSize, cellSize, cellSize);
                 } else if (col == 0 && row > 0) {
                     RowPanes[row - 1] = pane;
                     StyledDocument doc = pane.getStyledDocument();
                     SimpleAttributeSet align = new SimpleAttributeSet();
                     StyleConstants.setAlignment(align, StyleConstants.ALIGN_RIGHT);
                     doc.setParagraphAttributes(0, doc.getLength(), align, false);
-                    h1Group.addComponent(pane, 25, 25, 200);
-                    v1Group.addComponent(pane, 25, 25, 25);
+                    h1Group.addComponent(pane, rowWidth, rowWidth, rowWidth);
+                    v1Group.addComponent(pane, cellSize, cellSize, cellSize);
                 } else if (row == 0 && col > 0) {
                     ColPanes[col - 1] = pane;
-                    h1Group.addComponent(pane, 25, 25, 25);
-                    v1Group.addComponent(pane, 25, 25, 150);
+                    h1Group.addComponent(pane, cellSize, cellSize, cellSize);
+                    v1Group.addComponent(pane, colHeight, colHeight, colHeight);
                 } else {
-                    h1Group.addComponent(pane, 25, 25, 200);
-                    v1Group.addComponent(pane, 25, 25, 150);
+                    h1Group.addComponent(pane, rowWidth, rowWidth, rowWidth);
+                    v1Group.addComponent(pane, colHeight, colHeight, colHeight);
                 }
 
             }
         }
 
-        this.setSize(mainPanel.getWidth(), mainPanel.getHeight());
-        this.setResizable(true);
+        resize();
     }
 
     private void jTextPaneMouseClick(MouseEvent evt) {
@@ -446,6 +468,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         );
         setPanes();
         repaint();
+        //resize();
     }
 
     NanoGridGame Game;
@@ -454,19 +477,16 @@ public class NanoGridUI extends javax.swing.JFrame {
     public void createGame() {
         Game = new NanoGridGame(Settings);
         Game.create();
+        Game.getBoard().printBoard(System.out);
     }
 
     public void displayGame(boolean show) {
 
         NanoGridBoard board = Game.getBoard();
-
-        Integer[][] rcnts = board.getRowCounts();
-        int rmax = getMaxLength(rcnts);
-
-        displayColumnCounts(rmax * 2);
-
+        displayColumnCounts();
+        displayRowCounts();
         for (int r = 0; r < Settings.Rows; r++) {
-            displayRowCounts(r, rcnts, rmax);
+            
             for (int c = 0; c < Settings.Columns; c++) {
 
                 JTextPane pane = Panes[c][r];
@@ -480,76 +500,69 @@ public class NanoGridUI extends javax.swing.JFrame {
                 } else if (show) {
                     setClear(pane);
                 }
-                System.out.printf("%c ", board.getCell(c, r));
-            }
-
-            System.out.println();
-
-        }
-    }
-
-    private int getMaxLength(Integer[][] cnts) {
-        int max = 0;
-        for (int i = 0; i < cnts.length; i++) {
-            if (cnts[i].length > max) {
-                max = cnts[i].length;
             }
         }
-        return max;
     }
 
-    private String getPadding(int rmax) {
-        char[] chars = new char[rmax];
-        Array.setChar(chars, 0, ' ');
-        return new String(chars, 0, rmax);
-    }
-
-    private void displayColumnCounts(int rmax) {
-        NanoGridBoard board = Game.getBoard();
-        Integer[][] ccnts = board.getColumnCounts();
-        int cmax = getMaxLength(ccnts);
+    private void displayColumnCounts() {
         for (JTextPane p : ColPanes) {
             p.setText("");
         }
-        for (int i = cmax; i > 0; i--) {
-            System.out.printf(getPadding(rmax));
-            for (int col = 0; col < ccnts.length; col++) {
-                Integer[] cols = ccnts[col];
-                if (cols.length >= i) {
-                    Integer c = cols[cols.length - i];
-                    System.out.printf("%s ", c.toString());
-                    String txt = ColPanes[col].getText();
-                    if (txt.equals("")) {
-                        txt = c.toString();
-                    } else {
-                        txt = txt + "\n" + c.toString();
-                    }
-                    ColPanes[col].setText(txt);
-                } else {
-                    System.out.print("  ");
-                }
+        NanoGridBoard board = Game.getBoard();
+        Integer[][] ccnts = board.getColumnCounts();
+                
+        for (int i = 0 ;  i < ccnts.length;  i++) {
+            String txt = getColumnText(i,ccnts);
+            ColPanes[i].setText(txt);
+        }
+    }
+    
+    public String getColumnText(int col,Integer[][] ccnts){
+        StringBuilder sb = new StringBuilder();
+        Integer[] cols = ccnts[col];
+        int cmax = Game.getBoard().getMaxColumnCounts();
+        for (int c = 0; c < cmax; c++) {
+            int idx = cols.length-cmax+c;
+            if(idx >= 0)
+            {
+                if (idx != 0)
+                    sb.append("\n");
+                sb.append(cols[idx].toString());
             }
-            System.out.println();
+            else
+            {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+    
+    private void displayRowCounts() {
+        for (JTextPane p : RowPanes) {
+            p.setText("");
+        }
+        NanoGridBoard board = Game.getBoard();
+        Integer[][] rcnts = board.getRowCounts();
+        for(int r =0;r < rcnts.length;r++)  {      
+            String txt = getRowText(r, rcnts);
+            RowPanes[r].setText(txt);
         }
     }
 
-    private void displayRowCounts(int r, Integer[][] rcnts, int rmax) {
+    private String getRowText(int r, Integer[][] rcnts) {
         Integer[] row = rcnts[r];
+        
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < rmax; i++) {
-            if (i < row.length) {
-                System.out.printf("%s ", row[i].toString());
-                sb.append(String.format("%s ", row[i].toString()));
-            } else {
-                System.out.print("  ");
-                sb.append("  ");
-            }
+        for (int i = 0; i < row.length; i++) {
+            if(i>0)
+                sb.append(" ");
+            sb.append(row[i].toString());
         }
-        RowPanes[r].setText(sb.toString());
+        return sb.toString();
     }
 
     private void updateTextPane(JTextPane pane) {
-        Font f = new Font("Consolas", Font.BOLD, 20);
+        Font f = getBoardFont();
         pane.setFont(f);
         StyledDocument doc = pane.getStyledDocument();
         SimpleAttributeSet align = new SimpleAttributeSet();
@@ -637,7 +650,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         }
     }
 
-     private File getBoardFile() {
+    private File getBoardFile() {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "Nanogrid Save Files", "xml");
@@ -645,27 +658,79 @@ public class NanoGridUI extends javax.swing.JFrame {
         int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             return chooser.getSelectedFile();
-     }
+        }
         return null;
     }
 
     private void placeMarks() {
-        char[][]board = Game.getPlayColumns();
-        for(int c=0;c<board.length;c++){
-            for(int r=0;r<board.length;r++){
+        char[][] board = Game.getPlayColumns();
+        for (int c = 0; c < board.length; c++) {
+            for (int r = 0; r < board.length; r++) {
                 JTextPane pane = Panes[c][r];
-                if (board[c][r] == NanoGridBoard.FillChar){
+                if (board[c][r] == NanoGridBoard.FillChar) {
                     setCell(pane);
-                }
-                else if (board[c][r] == NanoGridBoard.MarkChar){
+                } else if (board[c][r] == NanoGridBoard.MarkChar) {
                     setMark(pane);
-                }
-                else{
+                } else {
                     setClear(pane);
                 }
-                    
+
             }
         }
+
+    }
+
+    private void resize() {
+        this.setResizable(true);
+        int rowWidth = getRowWidth();
+        int colHeight = getColHeight();
+        int cellSize = getCellSize();
+        int menuHgt = menuBarMain.getHeight();
+        int titleHeight = 30;
+        int bufHgt = (int)(5*(double)Settings.Rows)+25;
+        int bufWdt = (int)(5*(double)Settings.Columns)+35;
+        int wdt = rowWidth+cellSize*Settings.Columns+Settings.Columns+bufWdt;
+        int hgt = colHeight+cellSize*Settings.Rows+Settings.Rows+menuHgt+titleHeight+bufHgt;
+        setSize(new java.awt.Dimension(wdt,hgt));
         
+   }
+
+    private Font getBoardFont() {
+        return new Font("Consolas", Font.BOLD, 14);
+    }
+
+    private int getRowWidth() {
+        Font f = getBoardFont();
+        Graphics g = this.getGraphics();
+        int max = 0;
+        Integer[][] rcnts = Game.getBoard().getRowCounts();
+        FontMetrics metrics = g.getFontMetrics(f);
+        for(int r=0;r<Settings.Rows;r++){
+            String txt = getRowText(r,rcnts);
+            int wdt = metrics.stringWidth(txt);
+            if(wdt>max){
+                max = wdt;
+            }
+            
+        }
+        return max+5;
+    }
+
+    private int getColHeight() {
+         Font f = getBoardFont();
+        Graphics g = this.getGraphics();
+        int max =0;
+        int cnt = Game.getBoard().getMaxColumnCounts();
+        FontMetrics metrics = g.getFontMetrics(f);
+        max = metrics.getHeight()*cnt;
+        return max;
+    }
+
+    private int getCellSize() {
+         Font f = getBoardFont();
+        Graphics g = this.getGraphics();
+        FontMetrics metrics = g.getFontMetrics(f);
+        int hgt = metrics.getHeight();
+        return hgt+2;
     }
 }
