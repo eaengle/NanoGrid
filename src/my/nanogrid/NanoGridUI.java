@@ -333,8 +333,8 @@ public class NanoGridUI extends javax.swing.JFrame {
     private void initCustom() {
         
         Settings = new NanoGridParameters();
-        Settings.Columns = 5;
-        Settings.Rows = 5;
+        Settings.Columns = 15;
+        Settings.Rows = 15;
         GridDialog = new GridSizeDialog(this, true);
         GridDialog.setUI(this);
         setup();
