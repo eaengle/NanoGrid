@@ -81,6 +81,20 @@ public class NanoGridUI extends javax.swing.JFrame {
         setTitle("Nano Grid");
         setResizable(false);
         setSize(new java.awt.Dimension(100, 100));
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                formMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                formMouseExited(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                formMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                formMouseReleased(evt);
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -233,6 +247,24 @@ public class NanoGridUI extends javax.swing.JFrame {
     private void menuRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRefreshActionPerformed
         reset();
     }//GEN-LAST:event_menuRefreshActionPerformed
+    
+   
+    private void formMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseEntered
+       
+    }//GEN-LAST:event_formMouseEntered
+
+    private void formMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseExited
+       
+    }//GEN-LAST:event_formMouseExited
+
+    boolean MouseDown = false;
+    private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
+        MouseDown = true;
+    }//GEN-LAST:event_formMousePressed
+
+    private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
+        MouseDown = false;
+    }//GEN-LAST:event_formMouseReleased
 
     /**
      * @param args the command line arguments
@@ -337,7 +369,7 @@ public class NanoGridUI extends javax.swing.JFrame {
     JTextPane[][] Panes;
     JTextPane[] RowPanes;
     JTextPane[] ColPanes;
-
+    JTextPane Corner;
     
     private void setPanes() {
         
@@ -384,6 +416,7 @@ public class NanoGridUI extends javax.swing.JFrame {
                     h1Group.addComponent(pane, cellSize, cellSize, cellSize);
                     v1Group.addComponent(pane, colHeight, colHeight, colHeight);
                 } else {
+                    Corner =pane;
                     h1Group.addComponent(pane, rowWidth, rowWidth, rowWidth);
                     v1Group.addComponent(pane, colHeight, colHeight, colHeight);
                 }
@@ -394,30 +427,26 @@ public class NanoGridUI extends javax.swing.JFrame {
         resize();
     }
 
-    private void jTextPaneMouseClick(MouseEvent evt) {
+    private void jTextPaneMousePressed(MouseEvent evt) {
+        MouseDown =true;
         JTextPane pane = (JTextPane) evt.getComponent();
         pane = getPane(pane);
-        if (pane != null) {
-
-            String tx = pane.getText();
-            if (tx.equals("X")) {
-                setClear(pane);
-            } else if (tx.equals("#")) {
-                setMark(pane);
-            } else {
-                setCell(pane);
-            }
-            if (Game.checkWin()) {
-                winGame();
-            }
-        }
+        cellClicked(pane);
+    }
+    
+    private void jTextPaneMouseReleased(MouseEvent evt) {
+        MouseDown =false;
+       
     }
 
+    
     private void jTextPaneMouseEntered(MouseEvent evt) {
         JTextPane pane = (JTextPane) evt.getComponent();
         pane = getPane(pane);
         if (pane != null) {
-            //setColor(pane,Color.red);
+            if(MouseDown){
+                cellClicked(pane);
+            }
         }
     }
 
@@ -425,7 +454,8 @@ public class NanoGridUI extends javax.swing.JFrame {
         JTextPane pane = (JTextPane) evt.getComponent();
         pane = getPane(pane);
         if (pane != null) {
-            //setColor(pane, Color.white);
+           //PaneEntered = false;
+           
         }
     }
 
@@ -445,9 +475,17 @@ public class NanoGridUI extends javax.swing.JFrame {
 
             @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jTextPaneMouseClick(evt);
+                jTextPaneMouseReleased(evt);
+            }
+            
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTextPaneMousePressed(evt);
             }
 
+            
+            
+           
         });
 
         return pane;
@@ -732,5 +770,22 @@ public class NanoGridUI extends javax.swing.JFrame {
         FontMetrics metrics = g.getFontMetrics(f);
         int hgt = metrics.getHeight();
         return hgt+2;
+    }
+
+    private void cellClicked(JTextPane pane) {
+        if (pane != null) {
+
+            String tx = pane.getText();
+            if (tx.equals("X")) {
+                setClear(pane);
+            } else if (tx.equals("#")) {
+                setMark(pane);
+            } else {
+                setCell(pane);
+            }
+            if (Game.checkWin()) {
+                winGame();
+            }
+        }
     }
 }
