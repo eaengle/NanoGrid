@@ -335,6 +335,9 @@ public class NanoGridUI extends javax.swing.JFrame {
         Settings = new NanoGridParameters();
         Settings.Columns = 15;
         Settings.Rows = 15;
+        Settings.MaxColumnSquares=6;
+        Settings.MaxRowSquares=6;
+        Settings.RowBreakChance = 0;
         GridDialog = new GridSizeDialog(this, true);
         GridDialog.setUI(this);
         setup();
@@ -635,10 +638,12 @@ public class NanoGridUI extends javax.swing.JFrame {
     }
 
     private void winGame() {
+        
         JOptionPane.showMessageDialog(this,
                 "You Won the Game",
                 "You Won!",
                 JOptionPane.OK_OPTION);
+        MouseDown = false;
         displayGame(true);
     }
 
