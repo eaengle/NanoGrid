@@ -5,13 +5,16 @@
  */
 package my.nanogrid;
 
+import com.sun.javafx.binding.StringFormatter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.TextArea;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowListener;
@@ -19,6 +22,7 @@ import java.awt.font.LineMetrics;
 import java.io.File;
 import java.lang.reflect.Array;
 import static javafx.application.Platform.exit;
+import javafx.scene.layout.Border;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFileChooser;
@@ -32,7 +36,9 @@ import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -381,7 +387,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         RowPanes = new JTextPane[Settings.Rows];
         
         GroupLayout layout = (GroupLayout) mainPanel.getLayout();
-        layout.setAutoCreateGaps(true);
+        //layout.setAutoCreateGaps(true);
 
         GroupLayout.ParallelGroup hGroup = layout.createParallelGroup();
         layout.setHorizontalGroup(hGroup);
@@ -411,11 +417,16 @@ public class NanoGridUI extends javax.swing.JFrame {
                     StyledDocument doc = pane.getStyledDocument();
                     SimpleAttributeSet align = new SimpleAttributeSet();
                     StyleConstants.setAlignment(align, StyleConstants.ALIGN_RIGHT);
+                    StyleConstants.setRightIndent( align,1);
                     doc.setParagraphAttributes(0, doc.getLength(), align, false);
                     h1Group.addComponent(pane, rowWidth, rowWidth, rowWidth);
                     v1Group.addComponent(pane, cellSize, cellSize, cellSize);
                 } else if (row == 0 && col > 0) {
                     ColPanes[col - 1] = pane;
+                    StyledDocument doc = pane.getStyledDocument();
+                    SimpleAttributeSet align = new SimpleAttributeSet();
+                    StyleConstants.setSpaceBelow(align,2);
+                    doc.setParagraphAttributes(0, doc.getLength(), align, false);
                     h1Group.addComponent(pane, cellSize, cellSize, cellSize);
                     v1Group.addComponent(pane, colHeight, colHeight, colHeight);
                 } else {
@@ -431,10 +442,20 @@ public class NanoGridUI extends javax.swing.JFrame {
     }
 
     private void jTextPaneMousePressed(MouseEvent evt) {
-        MouseDown =true;
         JTextPane pane = (JTextPane) evt.getComponent();
-        pane = getPane(pane);
-        cellClicked(pane);
+        if (evt.getButton() == MouseEvent.BUTTON3) {
+            Point p = new Point();
+            getPane(pane,p);
+            StartX = p.x;
+            StartY = p.y;
+        }
+        else if (evt.getButton() == MouseEvent.BUTTON1){
+            MouseDown =true;
+            
+            Point p = new Point();
+            pane = getPane(pane,p);
+            cellClicked(pane);
+        }
     }
     
     private void jTextPaneMouseReleased(MouseEvent evt) {
@@ -442,20 +463,33 @@ public class NanoGridUI extends javax.swing.JFrame {
        
     }
 
-    
+    int StartX = 0;
+    int StartY = 0;
     private void jTextPaneMouseEntered(MouseEvent evt) {
         JTextPane pane = (JTextPane) evt.getComponent();
-        pane = getPane(pane);
+        Point p = new Point();
+        pane = getPane(pane,p);
         if (pane != null) {
             if(MouseDown){
                 cellClicked(pane);
             }
+            /*
+            String str= String.format("%d/%d\n%d/%d\n%d/%d",
+                      p.x+1, Settings.Columns - p.x,
+                      p.y+1,Settings.Rows-p.y,
+                      p.x-StartX,p.y-StartY);*/
+            int xmod = StartX <= p.x ? 1 : -1;
+            int ymod = StartY <= p.y ? 1 : -1;
+            String str= String.format("%d/%d",
+                      p.x-StartX+xmod,p.y-StartY+ymod);
+            Corner.setText(str);
         }
     }
 
     private void jTextPaneMouseExited(MouseEvent evt) {
         JTextPane pane = (JTextPane) evt.getComponent();
-        pane = getPane(pane);
+        Point p = new Point();
+        pane = getPane(pane,p);
         if (pane != null) {
            //PaneEntered = false;
            
@@ -610,15 +644,20 @@ public class NanoGridUI extends javax.swing.JFrame {
         StyleConstants.setAlignment(align, StyleConstants.ALIGN_CENTER);
         doc.setParagraphAttributes(0, doc.getLength(), align, false);
         pane.setEditable(false);
-        pane.setBorder(null);
+       
+        javax.swing.border.LineBorder bdr = new LineBorder(Color.LIGHT_GRAY,1);
+        
+        pane.setBorder(bdr);
         pane.setSelectedTextColor(new java.awt.Color(255, 153, 153));
         pane.setFocusable(false);
     }
 
-    private JTextPane getPane(JTextPane pane) {
+    private JTextPane getPane(JTextPane pane,Point p) {
         for (int c = 0; c < Settings.Columns; c++) {
             for (int r = 0; r < Settings.Rows; r++) {
                 if (Panes[c][r] == pane) {
+                    p.x = c;
+                    p.y = r;
                     return pane;
                 }
             }
@@ -730,8 +769,8 @@ public class NanoGridUI extends javax.swing.JFrame {
         int cellSize = getCellSize();
         int menuHgt = menuBarMain.getHeight();
         int titleHeight = 30;
-        int bufHgt = (int)(5*(double)Settings.Rows)+25;
-        int bufWdt = (int)(5*(double)Settings.Columns)+35;
+        int bufHgt = (int)(.5*(double)Settings.Rows)+5;//(int)(5*(double)Settings.Rows)+25;
+        int bufWdt = (int)(.5*(double)Settings.Columns)+10;//(int)(5*(double)Settings.Columns)+35;
         int wdt = rowWidth+cellSize*Settings.Columns+Settings.Columns+bufWdt;
         int hgt = colHeight+cellSize*Settings.Rows+Settings.Rows+menuHgt+titleHeight+bufHgt;
         setSize(new java.awt.Dimension(wdt,hgt));
@@ -756,7 +795,7 @@ public class NanoGridUI extends javax.swing.JFrame {
             }
             
         }
-        return max+5;
+        return max+10;
     }
 
     private int getColHeight() {
@@ -765,7 +804,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         int max =0;
         int cnt = Game.getBoard().getMaxColumnCounts();
         FontMetrics metrics = g.getFontMetrics(f);
-        max = metrics.getHeight()*cnt;
+        max = metrics.getHeight()*cnt+(cnt*2);
         return max;
     }
 
