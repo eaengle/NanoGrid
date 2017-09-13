@@ -16,11 +16,15 @@ import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowListener;
 import java.awt.font.LineMetrics;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static javafx.application.Platform.exit;
 import javafx.scene.layout.Border;
 import javax.swing.GroupLayout;
@@ -34,6 +38,7 @@ import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
@@ -82,6 +87,14 @@ public class NanoGridUI extends javax.swing.JFrame {
         menuSettings = new javax.swing.JMenu();
         menuOptions = new javax.swing.JMenuItem();
         menuRefresh = new javax.swing.JMenuItem();
+        menuNewPuzzle = new javax.swing.JMenuItem();
+        menuHint = new javax.swing.JMenu();
+        menuCheck = new javax.swing.JMenuItem();
+        menuPeek = new javax.swing.JMenuItem();
+        menuShow = new javax.swing.JMenuItem();
+        menuHelp = new javax.swing.JMenu();
+        menuInstructions = new javax.swing.JMenuItem();
+        menuAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Nano Grid");
@@ -184,7 +197,58 @@ public class NanoGridUI extends javax.swing.JFrame {
         });
         menuSettings.add(menuRefresh);
 
+        menuNewPuzzle.setText("New Puzzle");
+        menuNewPuzzle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuNewPuzzleActionPerformed(evt);
+            }
+        });
+        menuSettings.add(menuNewPuzzle);
+
         menuBarMain.add(menuSettings);
+
+        menuHint.setText("Hint");
+
+        menuCheck.setText("Check");
+        menuCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCheckActionPerformed(evt);
+            }
+        });
+        menuHint.add(menuCheck);
+
+        menuPeek.setText("Peek");
+        menuPeek.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuPeekActionPerformed(evt);
+            }
+        });
+        menuHint.add(menuPeek);
+
+        menuShow.setText("Show");
+        menuShow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuShowActionPerformed(evt);
+            }
+        });
+        menuHint.add(menuShow);
+
+        menuBarMain.add(menuHint);
+
+        menuHelp.setText("Help");
+
+        menuInstructions.setText("Instructions");
+        menuHelp.add(menuInstructions);
+
+        menuAbout.setText("About");
+        menuAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAboutActionPerformed(evt);
+            }
+        });
+        menuHelp.add(menuAbout);
+
+        menuBarMain.add(menuHelp);
 
         setJMenuBar(menuBarMain);
 
@@ -251,7 +315,7 @@ public class NanoGridUI extends javax.swing.JFrame {
     }//GEN-LAST:event_menuSavePuzzleActionPerformed
 
     private void menuRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRefreshActionPerformed
-        reset();
+        refreshGame();
     }//GEN-LAST:event_menuRefreshActionPerformed
 
 
@@ -271,6 +335,44 @@ public class NanoGridUI extends javax.swing.JFrame {
     private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
         MouseDown = false;
     }//GEN-LAST:event_formMouseReleased
+
+    private void menuNewPuzzleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuNewPuzzleActionPerformed
+        reset();
+    }//GEN-LAST:event_menuNewPuzzleActionPerformed
+
+    private void menuCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCheckActionPerformed
+        int cnt = Game.getIncorrectMoves();
+        JOptionPane.showMessageDialog(
+                this,
+                String.format("You have %d incorrect move(s).", cnt),
+                "Puzzle Check",
+                JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_menuCheckActionPerformed
+
+    private void menuShowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuShowActionPerformed
+        displayGame(true);
+    }//GEN-LAST:event_menuShowActionPerformed
+
+    private void menuPeekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuPeekActionPerformed
+        revealGame();
+        int delay = 1000; //milliseconds
+        ActionListener taskPerformer = new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                placeMarks();
+            }
+        };
+        Timer t = new Timer(delay, taskPerformer);
+        t.setRepeats(false);
+        t.start();
+    }//GEN-LAST:event_menuPeekActionPerformed
+
+    private void menuAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAboutActionPerformed
+        JOptionPane.showMessageDialog(
+                this,
+                "Nano Grid\n by Eric Engle",
+                "Nano Grid",
+                JOptionPane.PLAIN_MESSAGE);
+    }//GEN-LAST:event_menuAboutActionPerformed
 
     /**
      * @param args the command line arguments
@@ -316,16 +418,24 @@ public class NanoGridUI extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPanel mainPanel;
+    private javax.swing.JMenuItem menuAbout;
     private javax.swing.JMenuBar menuBarMain;
+    private javax.swing.JMenuItem menuCheck;
     private javax.swing.JMenuItem menuExit;
     private javax.swing.JMenu menuFile;
+    private javax.swing.JMenu menuHelp;
+    private javax.swing.JMenu menuHint;
+    private javax.swing.JMenuItem menuInstructions;
     private javax.swing.JMenuItem menuLoadGame;
     private javax.swing.JMenuItem menuLoadPuzzle;
+    private javax.swing.JMenuItem menuNewPuzzle;
     private javax.swing.JMenuItem menuOptions;
+    private javax.swing.JMenuItem menuPeek;
     private javax.swing.JMenuItem menuRefresh;
     private javax.swing.JMenuItem menuSaveGame;
     private javax.swing.JMenuItem menuSavePuzzle;
     private javax.swing.JMenu menuSettings;
+    private javax.swing.JMenuItem menuShow;
     // End of variables declaration//GEN-END:variables
     private void setColor(JTextPane pane, Color bgColor) {
         UIDefaults defaults = new UIDefaults();
@@ -564,6 +674,30 @@ public class NanoGridUI extends javax.swing.JFrame {
         Game = new NanoGridGame(Settings);
         Game.create();
         Game.getBoard().printBoard(System.out);
+    }
+
+    public void revealGame() {
+        NanoGridBoard board = Game.getBoard();
+
+        for (int r = 0; r < Settings.Rows; r++) {
+
+            for (int c = 0; c < Settings.Columns; c++) {
+
+                JTextPane pane = Panes[c][r];
+                char ch = board.getCell(c, r);
+               
+                if (pane.getText().equals(String.valueOf(NanoGridBoard.FillChar))) {
+                    pane.setForeground(Color.green);
+                    setColor(pane, Color.green);
+                }
+                else if (ch == NanoGridBoard.FillChar){
+                     setColor(pane, Color.black);
+                     pane.setForeground(Color.black);
+                }
+                pane.setText(String.valueOf(ch));
+                
+            }
+        }
     }
 
     public void displayGame(boolean show) {
@@ -919,6 +1053,15 @@ public class NanoGridUI extends javax.swing.JFrame {
         SimpleAttributeSet align = new SimpleAttributeSet();
         StyleConstants.setSpaceBelow(align, 2);
         doc.setParagraphAttributes(0, doc.getLength(), align, false);
+    }
+
+    private void refreshGame() {
+
+        for (int c = 0; c < Panes.length; c++) {
+            for (int r = 0; r < Panes[0].length; r++) {
+                setClear(Panes[c][r]);
+            }
+        }
     }
 
 }
