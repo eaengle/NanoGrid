@@ -1,1 +1,0 @@
-MutableAttributeSet attr = (MutableAttributeSet) run.getAttributes();

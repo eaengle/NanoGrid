@@ -238,6 +238,11 @@ public class NanoGridUI extends javax.swing.JFrame {
         menuHelp.setText("Help");
 
         menuInstructions.setText("Instructions");
+        menuInstructions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuInstructionsActionPerformed(evt);
+            }
+        });
         menuHelp.add(menuInstructions);
 
         menuAbout.setText("About");
@@ -374,6 +379,10 @@ public class NanoGridUI extends javax.swing.JFrame {
                 JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_menuAboutActionPerformed
 
+    private void menuInstructionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuInstructionsActionPerformed
+        Instructions.setVisible(true);
+    }//GEN-LAST:event_menuInstructionsActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -446,6 +455,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         updateTextPane(pane);
     }
 
+    InstructionDialog Instructions;
     private void initCustom() {
 
         Settings = new NanoGridParameters();
@@ -456,6 +466,8 @@ public class NanoGridUI extends javax.swing.JFrame {
         Settings.RowBreakChance = 0;
         GridDialog = new GridSizeDialog(this, true);
         GridDialog.setUI(this);
+        Instructions = new InstructionDialog(this,true);
+        
         setup();
 
     }

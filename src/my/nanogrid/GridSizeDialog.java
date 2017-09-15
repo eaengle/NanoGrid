@@ -5,6 +5,9 @@
  */
 package my.nanogrid;
 
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
+import javax.swing.JSpinner;
 import nanogridgame.NanoGridParameters;
 
 /**
@@ -19,6 +22,7 @@ public class GridSizeDialog extends javax.swing.JDialog {
     public GridSizeDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        initCustom();
     }
 
     
@@ -239,4 +243,18 @@ public class GridSizeDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner rowBreakSpinner;
     private javax.swing.JSpinner rowSpinner;
     // End of variables declaration//GEN-END:variables
+
+    private void initCustom() {
+        InputVerifier iv = new InputVerifier() {
+            @Override
+            public boolean verify(JComponent jc) {
+                JSpinner s = (JSpinner)jc;
+                String val = s.getValue().toString();
+                Integer i= Integer.getInteger(val, -1);
+                return i >=3 && i <=50;
+                
+            }
+        };
+        colSpinner.setInputVerifier(iv);
+    }
 }
