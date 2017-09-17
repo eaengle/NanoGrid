@@ -8,6 +8,8 @@ package my.nanogrid;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 import nanogridgame.NanoGridParameters;
 
 /**
@@ -19,8 +21,11 @@ public class GridSizeDialog extends javax.swing.JDialog {
     /**
      * Creates new form GridSizeDialog
      */
+    SpinnerNumberModel ColumnNumberModel ;
+    
     public GridSizeDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        ColumnNumberModel = new SpinnerNumberModel(5,5,50,1);
         initComponents();
         initCustom();
     }
@@ -61,6 +66,10 @@ public class GridSizeDialog extends javax.swing.JDialog {
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("Columns");
 
+        colSpinner.setModel(new javax.swing.SpinnerNumberModel(5, 5, 50, 1));
+
+        rowSpinner.setModel(new javax.swing.SpinnerNumberModel(5, 5, 35, 1));
+
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,13 +88,19 @@ public class GridSizeDialog extends javax.swing.JDialog {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setText("Max Columns");
 
+        maxColsSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 0, null, 1));
+
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel4.setText("Max Rows");
 
+        maxRowsSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 0, null, 1));
+
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel5.setText("Break %");
+
+        rowBreakSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 100, 10));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -244,17 +259,42 @@ public class GridSizeDialog extends javax.swing.JDialog {
     private javax.swing.JSpinner rowSpinner;
     // End of variables declaration//GEN-END:variables
 
+    
     private void initCustom() {
-        InputVerifier iv = new InputVerifier() {
-            @Override
-            public boolean verify(JComponent jc) {
-                JSpinner s = (JSpinner)jc;
-                String val = s.getValue().toString();
-                Integer i= Integer.getInteger(val, -1);
-                return i >=3 && i <=50;
-                
-            }
-        };
-        colSpinner.setInputVerifier(iv);
+        ChangeListener cl = new MaxValueChangeListener(this);
+        maxColsSpinner.getModel().addChangeListener(cl);
+        maxRowsSpinner.getModel().addChangeListener(cl);
+        colSpinner.getModel().addChangeListener(cl);
+        rowSpinner.getModel().addChangeListener(cl);
+    }
+
+    void validateChange(SpinnerNumberModel src) {
+        Integer val = (Integer)src.getValue();
+        if (src == maxColsSpinner.getModel())
+        {
+            Integer v2 = (Integer)colSpinner.getModel().getValue();
+            if (val > v2)
+                src.setValue(v2);
+        }
+        else if (src == maxRowsSpinner.getModel())
+        {
+            Integer v2 = (Integer)rowSpinner.getModel().getValue();
+            if (val > v2)
+                src.setValue(v2);
+        }
+        else if (src == rowSpinner.getModel())
+        {
+            SpinnerNumberModel mdl = (SpinnerNumberModel) maxRowsSpinner.getModel();
+            Integer v2 = (Integer)mdl.getValue();
+            if (val < v2)
+                mdl.setValue(val);
+        }
+        else if (src == colSpinner.getModel())
+        {
+            SpinnerNumberModel mdl = (SpinnerNumberModel) maxColsSpinner.getModel();
+            Integer v2 = (Integer)mdl.getValue();
+            if (val < v2)
+                mdl.setValue(val);
+        }
     }
 }
