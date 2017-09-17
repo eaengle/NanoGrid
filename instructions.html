@@ -1,6 +1,6 @@
 <h1>Nano Grid Instructions</h1>
 <h2>How to Play</h2>
-<p>The object of the same is to find all of the hidden blocks.</p>
+<p>The object of the game is to find all of the hidden blocks.</p>
 <p>The numbers above and before the columns and rows represent how many continuous blocks are in each. An example solution is shown below.</p>
 <table style="height: 141px;" border="1" width="148">
 <tbody>
@@ -39,22 +39,41 @@
 </tr>
 </tbody>
 </table>
-<p>Simply click any box to fill it. Click it again to set a red X. These help to remind you which blocks cannot be filled.</p>
-<p>Right clicking a box will start measurement line. Simply move the mouse and the block count from the clicked box will appear. Use this to help you counting.</p>
+<p>Simply click any box to change the character. Holding the button will continuously draw the selected character.</p>
+<p><span style="color: #000000; background-color: #000000;">&nbsp;&nbsp;<span style="background-color: #ffffff;"> - Filled Block</span></span></p>
+<p><span style="color: #ff0000; background-color: #ffffff;">X&nbsp;<span style="color: #000000;">- Use this to mark which blocks you are sure cannot be filled</span></span></p>
+<p><span style="color: #ff0000; background-color: #ffffff;"><span style="color: #000000;">Empty - Unselected block</span></span></p>
+<p>Right clicking a box will start measurement line. Simply move the mouse and the block count from the clicked box will appear. This is often very useful when counting is required.&nbsp;</p>
 <p>The game will automatically tell you when you have found a successful solution.&nbsp;</p>
 <h2>Menus</h2>
-<h3>File</h3>
-<p><strong>Load/Save Game -&nbsp;</strong> Load and save the current game, including marks.</p>
-<p><strong>Load/Save Puzzle -&nbsp;</strong> Load and save the current puzzle excluding marks.</p>
-<h3>Settings</h3>
-<p><strong>Grid Options -&nbsp;</strong>Opens a dialog which allows for custom grid creation options. Clicking OK from this dialog will regenerate the puzzle.</p>
-<p>Columns/Rows: the grid size.</p>
-<p>Max Columns/Row - The maximum number of squares in each column or row. Keep in mind that after actual generation the combination of column and row marks may lead to more marks than these set maximums. Usually the higher this number the easier the game will be.&nbsp;</p>
-<p>Break % - The percent chance that a row will be split during the grid generation. Typically higher numbers will result in scattered puuzzles. A 0% is the standard value.</p>
-<p><strong>Refresh Puzzle -&nbsp;</strong>Clears all marks from the existing puzzle.</p>
-<p><strong>New Puzzle -&nbsp;</strong>Generate a new puzzle using the current settings.</p>
-<h3>Hint</h3>
-<p><strong>Check -</strong> Display the number of misplaced marks.</p>
-<p><strong>Peek - </strong>Display the puzzle solution for 1 second.</p>
-<p><strong>Show -&nbsp;</strong>Show the completed puzzle.</p>
+<ul>
+<li><span style="background-color: #ffffff; color: #ff6600;"><strong>File &nbsp; &nbsp; &nbsp; &nbsp;</strong></span>
+<ul>
+<li><strong>Load/Save Game -&nbsp;</strong> Load and save the current game, including marks.</li>
+<li><strong>Load/Save Puzzle -&nbsp;</strong> Load and save the current puzzle excluding marks.</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><span style="color: #ff6600;"><span style="background-color: #0000ff;"><span style="color: #ff6600; background-color: #ffffff;"><strong>Settings</strong>&nbsp;</span></span></span>
+<ul>
+<li><strong>Grid Options -&nbsp;</strong>Opens a dialog which allows for custom grid creation options. Clicking OK from this dialog will regenerate the puzzle.
+<ul>
+<li><strong>Columns/Rows</strong>: the grid size.</li>
+<li><strong>Columns/Row Count</strong> - The number of squares in each column or row. The actual number will be affected by a combination of the row and column counts, and the break chance . Usually the higher this number the easier the game will be.</li>
+<li><strong>Break %</strong> - The percent chance that a column/row will be split during the grid generation. Each split will reduce the count by 1, and create an empty square. Typically higher numbers will result in more scattered puzzles.</li>
+</ul>
+</li>
+<li><strong>Refresh Puzzle -&nbsp;</strong>Clears all marks from the existing puzzle.</li>
+<li><strong>New Puzzle -&nbsp;</strong>Generate a new puzzle using the current settings.</li>
+</ul>
+</li>
+<li><span style="color: #ff6600; background-color: #ffffff;"><strong>Hint &nbsp; &nbsp; &nbsp; &nbsp;</strong></span>
+<ul>
+<li><strong>Check -</strong> Display the number of misplaced marks.</li>
+<li><strong>Peek - </strong>Display the puzzle solution for 1 second.</li>
+<li><strong>Show -&nbsp;</strong>Show the completed puzzle.</li>
+</ul>
+</li>
+</ul>
 <p>&nbsp;</p>
