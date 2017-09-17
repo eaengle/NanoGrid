@@ -5,46 +5,28 @@
  */
 package my.nanogrid;
 
-import com.sun.javafx.binding.StringFormatter;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowListener;
-import java.awt.font.LineMetrics;
 import java.io.File;
-import java.lang.reflect.Array;
-import java.nio.file.Files;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import static javafx.application.Platform.exit;
-import javafx.scene.layout.Border;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 import static javax.swing.JOptionPane.OK_OPTION;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
-import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -457,6 +439,7 @@ public class NanoGridUI extends javax.swing.JFrame {
     }
 
     InstructionDialog Instructions;
+
     private void initCustom() {
 
         Settings = new NanoGridParameters();
@@ -467,8 +450,8 @@ public class NanoGridUI extends javax.swing.JFrame {
         Settings.RowBreakChance = 0;
         GridDialog = new GridSizeDialog(this, true);
         GridDialog.setUI(this);
-        Instructions = new InstructionDialog(this,true);
-        
+        Instructions = new InstructionDialog(this, true);
+
         setup();
 
     }
@@ -558,10 +541,14 @@ public class NanoGridUI extends javax.swing.JFrame {
     }
 
     char DrawChar;
+
     private void jTextPaneMousePressed(MouseEvent evt) {
         JTextPane pane = (JTextPane) evt.getComponent();
         Point p = new Point();
-        getPane(pane, p);
+        if (!getPane(pane, p)) {
+            return;
+        }
+
         if (evt.getButton() == MouseEvent.BUTTON3) {
             StartX = p.x;
             StartY = p.y;
@@ -570,11 +557,14 @@ public class NanoGridUI extends javax.swing.JFrame {
             clearBorders();
             cellClicked(pane);
             MouseDown = true;
-            DrawChar =  pane.getText().toCharArray()[0];
+            char[] chrs = pane.getText().toCharArray();
+            if (chrs.length > 0) {
+                DrawChar = chrs[0];
+            }
             StartX = -1;
             StartY = -1;
             Corner.setText("");
-            
+
         }
     }
 
@@ -589,49 +579,52 @@ public class NanoGridUI extends javax.swing.JFrame {
     private void jTextPaneMouseEntered(MouseEvent evt) {
         JTextPane pane = (JTextPane) evt.getComponent();
         Point p = new Point();
-        pane = getPane(pane, p);
-        if (pane != null) {
-            if (MouseDown) {
-                setCell(pane,DrawChar);
-            }
-            if (StartX == p.x || StartY == p.y) {
-                int xmod = StartX <= p.x ? 1 : -1;
-                int ymod = StartY <= p.y ? 1 : -1;
-                int val = p.x - StartX + xmod;
-                if (p.x == StartX) {
-                    val = p.y - StartY + ymod;
-                }
-                String str = String.format("%d", val);
-                Corner.setText(str);
-                char ch = Game.getPlayColumns()[p.x][p.y];
-                if (ch == NanoGridBoard.FillChar) {
-                    pane.setForeground(Color.cyan);
-                }
-                pane.setText(String.valueOf(Math.abs(val)));
-                highlightBorders(p);
-
-            }
+        if (!getPane(pane, p)) {
+            return;
         }
+
+        if (MouseDown) {
+            setCell(pane, DrawChar);
+        }
+        if (StartX == p.x || StartY == p.y) {
+            int xmod = StartX <= p.x ? 1 : -1;
+            int ymod = StartY <= p.y ? 1 : -1;
+            int val = p.x - StartX + xmod;
+            if (p.x == StartX) {
+                val = p.y - StartY + ymod;
+            }
+            String str = String.format("%d", val);
+            Corner.setText(str);
+            char ch = Game.getPlayColumns()[p.x][p.y];
+            if (ch == NanoGridBoard.FillChar) {
+                pane.setForeground(Color.cyan);
+            }
+            pane.setText(String.valueOf(Math.abs(val)));
+            highlightBorders(p);
+
+        }
+
     }
 
     private void jTextPaneMouseExited(MouseEvent evt) {
         JTextPane pane = (JTextPane) evt.getComponent();
         Point p = new Point();
-        pane = getPane(pane, p);
-        if (pane != null) {
-            if (StartX >= 0 && StartY >= 0) {
-                pane.setText(String.valueOf(Game.getPlayColumns()[p.x][p.y]));
-                char ch = Game.getPlayColumns()[p.x][p.y];
-                if (ch == NanoGridBoard.MarkChar) {
-                    pane.setForeground(Color.red);
-                } else {
-                    pane.setForeground(Color.black);
-                }
-                clearBorders();
-                highlightStartPane();
-            }
-
+        if (!getPane(pane, p)) {
+            return;
         }
+
+        if (StartX >= 0 && StartY >= 0) {
+            pane.setText(String.valueOf(Game.getPlayColumns()[p.x][p.y]));
+            char ch = Game.getPlayColumns()[p.x][p.y];
+            if (ch == NanoGridBoard.MarkChar) {
+                pane.setForeground(Color.red);
+            } else {
+                pane.setForeground(Color.black);
+            }
+            clearBorders();
+            highlightStartPane();
+        }
+
     }
 
     private JTextPane createPane() {
@@ -699,17 +692,16 @@ public class NanoGridUI extends javax.swing.JFrame {
 
                 JTextPane pane = Panes[c][r];
                 char ch = board.getCell(c, r);
-               
+
                 if (pane.getText().equals(String.valueOf(NanoGridBoard.FillChar))) {
                     pane.setForeground(Color.green);
                     setColor(pane, Color.green);
-                }
-                else if (ch == NanoGridBoard.FillChar){
-                     setColor(pane, Color.black);
-                     pane.setForeground(Color.black);
+                } else if (ch == NanoGridBoard.FillChar) {
+                    setColor(pane, Color.black);
+                    pane.setForeground(Color.black);
                 }
                 pane.setText(String.valueOf(ch));
-                
+
             }
         }
     }
@@ -810,17 +802,17 @@ public class NanoGridUI extends javax.swing.JFrame {
         pane.setFocusable(false);
     }
 
-    private JTextPane getPane(JTextPane pane, Point p) {
+    private boolean getPane(JTextPane pane, Point p) {
         for (int c = 0; c < Settings.Columns; c++) {
             for (int r = 0; r < Settings.Rows; r++) {
                 if (Panes[c][r] == pane) {
                     p.x = c;
                     p.y = r;
-                    return pane;
+                    return true;
                 }
             }
         }
-        return null;
+        return false;
     }
 
     private int[] getBoardCoord(JTextPane pane) {
@@ -831,7 +823,7 @@ public class NanoGridUI extends javax.swing.JFrame {
                 }
             }
         }
-        return null;
+        return new int[]{0, 0};
     }
 
     private void winGame() {
@@ -846,18 +838,22 @@ public class NanoGridUI extends javax.swing.JFrame {
 
     private void setClear(JTextPane pane) {
         int[] coord = getBoardCoord(pane);
+
         pane.setText(" ");
         setColor(pane, Color.white);
         pane.setForeground(Color.black);
         Game.clearCell(coord[0], coord[1]);
+
     }
 
     private void setMark(JTextPane pane) {
         int[] coord = getBoardCoord(pane);
+
         pane.setText(String.valueOf(NanoGridBoard.MarkChar));
         setColor(pane, Color.white);
         pane.setForeground(Color.red);
         Game.setMark(coord[0], coord[1]);
+
     }
 
     private void setCell(JTextPane pane) {
@@ -866,19 +862,18 @@ public class NanoGridUI extends javax.swing.JFrame {
         setColor(pane, Color.black);
         pane.setForeground(Color.black);
         Game.setCell(coord[0], coord[1]);
+
     }
-    
+
     private void setCell(JTextPane pane, char ch) {
-        if (ch == NanoGridBoard.FillChar){
+        if (ch == NanoGridBoard.FillChar) {
             setCell(pane);
-        }
-        else if (ch == NanoGridBoard.MarkChar){
+        } else if (ch == NanoGridBoard.MarkChar) {
             setMark(pane);
-        }
-        else {
+        } else {
             setClear(pane);
         }
-            
+
     }
 
     private void verifyExit() {
@@ -899,30 +894,30 @@ public class NanoGridUI extends javax.swing.JFrame {
         int returnVal = chooser.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
-            String ext = getFileExtension(file); 
-            if (!ext.equals("xml"))
-            {
-                file = new File(chooser.getCurrentDirectory(),file.getName() +".xml");
+            String ext = getFileExtension(file);
+            if (!ext.equals("xml")) {
+                file = new File(chooser.getCurrentDirectory(), file.getName() + ".xml");
             }
             Game.saveGame(file);
         }
     }
-    public String getFileExtension (File file) {
+
+    public String getFileExtension(File file) {
         String separator = System.getProperty("file.separator");
         String name = file.getName();
         int indexOfLastSeparator = name.lastIndexOf(separator);
         String filename = name;
-        if (indexOfLastSeparator >= 1 && indexOfLastSeparator < name.length()-2 ){
+        if (indexOfLastSeparator >= 1 && indexOfLastSeparator < name.length() - 2) {
             filename = name.substring(indexOfLastSeparator + 1);
         }
         String fileExtension = "";
         int extensionIndex = filename.lastIndexOf(".");
-        if (extensionIndex >= 0 && extensionIndex < filename.length()-1){
-             fileExtension = filename.substring(extensionIndex + 1);
+        if (extensionIndex >= 0 && extensionIndex < filename.length() - 1) {
+            fileExtension = filename.substring(extensionIndex + 1);
         }
         return fileExtension;
     }
-    
+
     private File getBoardFile() {
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
@@ -934,8 +929,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         }
         return null;
     }
-    
-    
+
     private void placeMarks() {
         char[][] board = Game.getPlayColumns();
         for (int c = 0; c < board.length; c++) {
@@ -965,7 +959,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         int bufHgt = 20;
         int bufWdt = 27;
         int wdt = rowWidth + cellWdt * Settings.Columns + bufWdt;
-        int hgt = colHeight + cellHgt * Settings.Rows +  menuHgt + titleHeight + bufHgt;
+        int hgt = colHeight + cellHgt * Settings.Rows + menuHgt + titleHeight + bufHgt;
         setSize(new java.awt.Dimension(wdt, hgt));
 
     }
@@ -1001,7 +995,6 @@ public class NanoGridUI extends javax.swing.JFrame {
         return max;
     }
 
-        
     private int getCellSize() {
         Font f = getBoardFont();
         Graphics g = this.getGraphics();
@@ -1009,7 +1002,7 @@ public class NanoGridUI extends javax.swing.JFrame {
         int hgt = metrics.getHeight();
         return hgt + 2;
     }
-    
+
     private void cellClicked(JTextPane pane) {
         if (pane != null) {
 
@@ -1114,5 +1107,4 @@ public class NanoGridUI extends javax.swing.JFrame {
         }
     }
 
-    
 }
