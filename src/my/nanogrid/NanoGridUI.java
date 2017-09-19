@@ -933,7 +933,7 @@ public class NanoGridUI extends javax.swing.JFrame {
     private void placeMarks() {
         char[][] board = Game.getPlayColumns();
         for (int c = 0; c < board.length; c++) {
-            for (int r = 0; r < board.length; r++) {
+            for (int r = 0; r < board[0].length; r++) {
                 JTextPane pane = Panes[c][r];
                 if (board[c][r] == NanoGridBoard.FillChar) {
                     setCell(pane);
